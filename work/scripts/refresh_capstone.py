@@ -10,6 +10,7 @@ TRAIN_MONTHS = pd.period_range("2025-09", "2026-03", freq="M")
 VALIDATION_MONTH = pd.Period("2026-04", freq="M")
 SEALED_MONTH = pd.Period("2026-05", freq="M")
 DECLINE_RATIO = 0.80
+MIN_GSC_COVERAGE_DAYS = 20
 RANDOM_SEED = 42
 
 
@@ -40,12 +41,18 @@ def make_examples(monthly: pd.DataFrame) -> pd.DataFrame:
     frame["prior_clicks"] = grouped["clicks"].shift(1)
     frame["outcome_month"] = grouped["month"].shift(-1)
     frame["outcome_impressions"] = grouped["impressions"].shift(-1)
+    if "gsc_available_days" in frame.columns:
+        frame["outcome_gsc_available_days"] = grouped["gsc_available_days"].shift(-1)
 
     prior_is_consecutive = frame["prior_month"] == frame["month"].map(lambda value: value - 1)
     frame.loc[~prior_is_consecutive, ["prior_impressions", "prior_clicks"]] = np.nan
     outcome_is_consecutive = frame["outcome_month"] == frame["month"].map(lambda value: value + 1)
 
-    examples = frame.loc[outcome_is_consecutive & frame["impressions"].ge(100)].copy()
+    eligible = outcome_is_consecutive & frame["impressions"].ge(100)
+    if "gsc_available_days" in frame.columns:
+        eligible &= frame["gsc_available_days"].ge(MIN_GSC_COVERAGE_DAYS)
+        eligible &= frame["outcome_gsc_available_days"].ge(MIN_GSC_COVERAGE_DAYS)
+    examples = frame.loc[eligible].copy()
     examples["future_decline"] = (
         examples["outcome_impressions"] < DECLINE_RATIO * examples["impressions"]
     ).astype("int8")

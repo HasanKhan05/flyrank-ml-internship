@@ -1,0 +1,176 @@
+{
+  "warehouse_release": "flyrank_pseudonymized_warehouse_release_v20260703",
+  "unit_of_analysis": "one pseudonymized content item at one monthly decision anchor",
+  "feature_window": "month t plus prior consecutive month where available",
+  "label_window": "next consecutive month t+1",
+  "eligibility": "at least 100 feature-month impressions and 20 measured GSC days in t and t+1",
+  "feature_columns": [
+    "impressions",
+    "clicks",
+    "ctr",
+    "prior_impressions",
+    "prior_clicks",
+    "impression_momentum",
+    "avg_position",
+    "position_available",
+    "active_days",
+    "gsc_available_days",
+    "ga4_available_days",
+    "engaged_sessions",
+    "content_age_days",
+    "content_type",
+    "search_volume"
+  ],
+  "fields": [
+    {
+      "field": "impressions",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "measured GSC exposure; eligible rows require at least 100"
+    },
+    {
+      "field": "clicks",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "measured GSC clicks; not filled across unavailable days"
+    },
+    {
+      "field": "ctr",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "clicks divided by impressions; missing when denominator is zero"
+    },
+    {
+      "field": "prior_impressions",
+      "bucket": "feature",
+      "source_window": "prior month",
+      "availability_rule": "previous measured exposure; missing without a consecutive month"
+    },
+    {
+      "field": "prior_clicks",
+      "bucket": "feature",
+      "source_window": "prior month",
+      "availability_rule": "previous measured clicks; missing without a consecutive month"
+    },
+    {
+      "field": "impression_momentum",
+      "bucket": "feature",
+      "source_window": "feature/prior month",
+      "availability_rule": "current divided by prior impressions; missing when prior is zero"
+    },
+    {
+      "field": "avg_position",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "impression-weighted valid GSC position only"
+    },
+    {
+      "field": "position_available",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "explicit flag for a valid position denominator"
+    },
+    {
+      "field": "active_days",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "days with measured positive GSC impressions"
+    },
+    {
+      "field": "gsc_available_days",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "measurement coverage; labels require 20 days in t and t+1"
+    },
+    {
+      "field": "ga4_available_days",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "GA4 measurement coverage, not engagement"
+    },
+    {
+      "field": "engaged_sessions",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "NULL when GA4 has no measured days; never zero-filled"
+    },
+    {
+      "field": "content_age_days",
+      "bucket": "feature",
+      "source_window": "feature month",
+      "availability_rule": "age at feature-month end from safe content metadata"
+    },
+    {
+      "field": "content_type",
+      "bucket": "feature",
+      "source_window": "known by feature month",
+      "availability_rule": "structured public-safe category; unknown is explicit"
+    },
+    {
+      "field": "search_volume",
+      "bucket": "feature",
+      "source_window": "known by feature month",
+      "availability_rule": "structured opportunity context; missing remains missing"
+    },
+    {
+      "field": "future_decline",
+      "bucket": "label",
+      "source_window": "next month",
+      "availability_rule": "1 only when next-month impressions are below 80% of feature month with at least 20 measured GSC days in both months"
+    },
+    {
+      "field": "outcome_impressions",
+      "bucket": "label",
+      "source_window": "next month",
+      "availability_rule": "label source only; never predictive"
+    },
+    {
+      "field": "client_hash_id",
+      "bucket": "context",
+      "source_window": "stable pseudonym",
+      "availability_rule": "grouping, joins, and validation only"
+    },
+    {
+      "field": "content_hash_id",
+      "bucket": "context",
+      "source_window": "stable pseudonym",
+      "availability_rule": "queue reference only; never predictive"
+    },
+    {
+      "field": "month",
+      "bucket": "context",
+      "source_window": "feature month",
+      "availability_rule": "time splitting only"
+    },
+    {
+      "field": "raw names/domains/URLs/queries/titles",
+      "bucket": "excluded",
+      "source_window": "not used",
+      "availability_rule": "private or identifying"
+    },
+    {
+      "field": "all outcome-month fields",
+      "bucket": "excluded",
+      "source_window": "future",
+      "availability_rule": "would leak the answer"
+    },
+    {
+      "field": "IDs as model features",
+      "bucket": "excluded",
+      "source_window": "stable pseudonym",
+      "availability_rule": "non-portable identity signal"
+    },
+    {
+      "field": "provider_used/model_used",
+      "bucket": "excluded",
+      "source_window": "content metadata",
+      "availability_rule": "not needed for the editorial decision"
+    },
+    {
+      "field": "fact_content_query_90d",
+      "bucket": "excluded",
+      "source_window": "fixed rolling window",
+      "availability_rule": "overlaps final outcomes and creates leakage risk"
+    }
+  ]
+}

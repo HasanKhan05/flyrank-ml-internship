@@ -2,6 +2,12 @@ import unittest
 
 import pandas as pd
 
+from work.scripts.build_monthly_features import (
+    FEATURE_COLUMNS,
+    add_derived_features,
+    aggregate_monthly_frame,
+    validate_feature_contract,
+)
 from work.scripts.refresh_capstone import (
     assign_action,
     baseline_score,
@@ -12,6 +18,48 @@ from work.scripts.refresh_capstone import (
 
 
 class RefreshCapstoneTests(unittest.TestCase):
+    def test_monthly_aggregation_preserves_availability_and_safe_features(self):
+        daily = pd.DataFrame(
+            {
+                "report_date": pd.to_datetime(
+                    [
+                        "2026-04-01", "2026-04-02", "2026-05-01",
+                        "2026-05-02", "2026-06-01", "2026-06-02",
+                        "2026-04-01", "2026-05-01", "2026-06-01",
+                    ]
+                ),
+                "client_hash_id": ["client_a"] * 6 + ["client_b"] * 3,
+                "content_hash_id": ["content_a"] * 6 + ["content_b"] * 3,
+                "gsc_data_available": [True] * 9,
+                "ga4_data_available": [False, False, True, False, True, True, False, False, False],
+                "gsc_impressions": [100, 100, 90, 60, 50, 40, 120, 110, 100],
+                "gsc_clicks": [10, 10, 9, 6, 5, 4, 12, 11, 10],
+                "gsc_sum_position": [800, 0, 900, 600, 500, 400, 600, 660, 700],
+                "ga4_engaged_sessions": [0, 0, 7, 0, 4, 3, 0, 0, 0],
+                "content_created_date": pd.to_datetime(["2025-01-01"] * 9),
+            }
+        )
+
+        monthly = aggregate_monthly_frame(daily)
+        examples = add_derived_features(make_examples(monthly))
+
+        april_a = monthly.loc[
+            monthly["client_hash_id"].eq("client_a")
+            & monthly["month"].eq(pd.Timestamp("2026-04-01"))
+        ].iloc[0]
+        april_b = monthly.loc[
+            monthly["client_hash_id"].eq("client_b")
+            & monthly["month"].eq(pd.Timestamp("2026-04-01"))
+        ].iloc[0]
+        self.assertTrue(april_a["position_available"])
+        self.assertAlmostEqual(april_a["avg_position"], 8.0)
+        self.assertEqual(april_a["ga4_available_days"], 0)
+        self.assertTrue(pd.isna(april_a["engaged_sessions"]))
+        self.assertTrue(pd.isna(april_b["engaged_sessions"]))
+        self.assertFalse(any(name.startswith("outcome_") for name in FEATURE_COLUMNS))
+        self.assertNotIn("future_decline", FEATURE_COLUMNS)
+        validate_feature_contract(examples, FEATURE_COLUMNS)
+
     def test_future_label_uses_the_next_consecutive_month_only(self):
         monthly = pd.DataFrame(
             {

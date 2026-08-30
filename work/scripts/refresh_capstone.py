@@ -12,6 +12,12 @@ SEALED_MONTH = pd.Period("2026-05", freq="M")
 DECLINE_RATIO = 0.80
 MIN_GSC_COVERAGE_DAYS = 20
 RANDOM_SEED = 42
+BASELINE_WEIGHTS = {
+    "exposure": 0.40,
+    "momentum_risk": 0.30,
+    "established_content": 0.20,
+    "position_opportunity": 0.10,
+}
 
 
 def make_examples(monthly: pd.DataFrame) -> pd.DataFrame:
@@ -104,10 +110,10 @@ def baseline_score(frame: pd.DataFrame) -> pd.Series:
     position_opportunity = position_opportunity.where(position_available & position.gt(0), 0).fillna(0)
 
     score = 100 * (
-        0.40 * _fixed_exposure_component(impressions)
-        + 0.30 * momentum_risk
-        + 0.20 * established
-        + 0.10 * position_opportunity
+        BASELINE_WEIGHTS["exposure"] * _fixed_exposure_component(impressions)
+        + BASELINE_WEIGHTS["momentum_risk"] * momentum_risk
+        + BASELINE_WEIGHTS["established_content"] * established
+        + BASELINE_WEIGHTS["position_opportunity"] * position_opportunity
     )
     return score.clip(0, 100).rename("baseline_score")
 

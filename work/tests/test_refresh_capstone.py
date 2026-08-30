@@ -9,6 +9,7 @@ from work.scripts.build_monthly_features import (
     validate_feature_contract,
 )
 from work.scripts.refresh_capstone import (
+    BASELINE_WEIGHTS,
     assign_action,
     baseline_score,
     make_examples,
@@ -18,6 +19,22 @@ from work.scripts.refresh_capstone import (
 
 
 class RefreshCapstoneTests(unittest.TestCase):
+    def test_frozen_baseline_prioritizes_exposure_and_worsening_momentum(self):
+        frame = pd.DataFrame(
+            {
+                "impressions": [8_000, 200, 8_000],
+                "prior_impressions": [16_000, 200, 16_000],
+                "content_age_days": [500, 500, 500],
+                "avg_position": [8.0, 8.0, 8.0],
+                "position_available": [True, True, True],
+            }
+        )
+        scores = baseline_score(frame)
+
+        self.assertEqual(sum(BASELINE_WEIGHTS.values()), 1.0)
+        self.assertGreater(scores.iloc[0], scores.iloc[1])
+        self.assertEqual(scores.iloc[0], scores.iloc[2])
+
     def test_monthly_aggregation_preserves_availability_and_safe_features(self):
         daily = pd.DataFrame(
             {

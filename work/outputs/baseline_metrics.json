@@ -1,0 +1,23 @@
+{
+  "method": "fixed_transparent_baseline",
+  "validation_anchor": "2026-04 predicting 2026-05",
+  "validation_rows": 93474,
+  "validation_positive_rate": 0.5379463808117766,
+  "precision_at_50": 0.66,
+  "recall_at_50": 0.0006562723729218042,
+  "lift_at_50": 1.2268880757298544,
+  "average_precision": 0.5333564584802813,
+  "weights": {
+    "exposure": 0.4,
+    "momentum_risk": 0.3,
+    "established_content": 0.2,
+    "position_opportunity": 0.1
+  },
+  "thresholds": {
+    "eligibility_impressions": 100,
+    "decline_ratio": 0.8,
+    "high_priority_score": 70,
+    "medium_priority_score": 50
+  },
+  "sealed_month_used": false
+}

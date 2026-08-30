@@ -1,0 +1,59 @@
+{
+  "selected_method": "fixed_baseline",
+  "comparison_model": "random_forest",
+  "primary_metric": "precision_at_50",
+  "identical_rows": true,
+  "validation": {
+    "fixed_baseline": {
+      "rows": 93474,
+      "precision_at_50": 0.66,
+      "average_precision": 0.5333564584802813,
+      "recall_at_50": 0.0006562723729218042,
+      "lift_at_50": 1.2268880757298544
+    },
+    "random_forest": {
+      "rows": 93474,
+      "precision_at_50": 0.54,
+      "average_precision": 0.6041660074221528,
+      "recall_at_50": 0.0005369501232996579,
+      "lift_at_50": 1.0038175165062444
+    }
+  },
+  "sealed": {
+    "fixed_baseline": {
+      "rows": 93048,
+      "positive_rate": 0.6404006534261887,
+      "precision_at_50": 0.68,
+      "average_precision": 0.6701645103757737,
+      "recall_at_50": 0.0005705846814794925,
+      "lift_at_50": 1.0618352688460764
+    },
+    "random_forest": {
+      "rows": 93048,
+      "positive_rate": 0.6404006534261887,
+      "precision_at_50": 0.98,
+      "average_precision": 0.722195409818256,
+      "recall_at_50": 0.0008223132174263275,
+      "lift_at_50": 1.5302920051016982
+    }
+  },
+  "grouped_sealed_diagnostic": {
+    "fixed_baseline": {
+      "eligible_clients": 40,
+      "macro_average_precision": 0.514838413870643
+    },
+    "random_forest": {
+      "eligible_clients": 40,
+      "macro_average_precision": 0.5749312048489418
+    }
+  },
+  "claim_wording": "The learned comparison exceeded the validation-selected baseline on sealed Precision@50, showing temporal instability; the method is not retuned and claims remain directional.",
+  "sealed_evaluated_once": true,
+  "sealed_anchor": "2026-05 predicting 2026-06",
+  "limitations": [
+    "temporal base-rate variation",
+    "observational label is not a causal refresh effect",
+    "coverage filters narrow applicability",
+    "content intent and seasonality are not fully represented"
+  ]
+}

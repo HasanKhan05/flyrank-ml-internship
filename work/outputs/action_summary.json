@@ -1,0 +1,45 @@
+{
+  "ranking_method": "validation-selected fixed transparent baseline",
+  "feature_anchor": "2026-05",
+  "review_capacity": 50,
+  "eligible_rows": 93048,
+  "public_queue_columns": [
+    "rank",
+    "content_hash_id",
+    "baseline_score",
+    "suggested_action",
+    "reason_codes",
+    "confidence_tier",
+    "impressions",
+    "impression_momentum",
+    "avg_position",
+    "position_available",
+    "content_age_days"
+  ],
+  "action_counts": {
+    "refresh_or_expand_review": 50
+  },
+  "reason_counts": {
+    "meaningful_exposure": 34,
+    "negative_prior_momentum": 50,
+    "visible_position": 50
+  },
+  "confidence_counts": {
+    "medium": 30,
+    "high": 20
+  },
+  "intended_use": "prioritize human content review",
+  "no_go": [
+    "no automatic edit/delete",
+    "no causal refresh claim",
+    "no Google algorithm claim",
+    "no identifying data exposure",
+    "no missing-as-zero interpretation"
+  ],
+  "monitoring_triggers": [
+    "base rate shift over 10 percentage points",
+    "key-feature missingness shift over 10 points",
+    "Precision@50 below contemporaneous base rate",
+    "warehouse schema or release change"
+  ]
+}

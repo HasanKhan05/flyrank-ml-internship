@@ -9,8 +9,10 @@ from work.scripts.build_monthly_features import (
     validate_feature_contract,
 )
 from work.scripts.refresh_capstone import (
+    ALLOWED_ACTIONS,
     BASELINE_WEIGHTS,
     MODEL_FEATURES,
+    PUBLIC_QUEUE_COLUMNS,
     build_candidate_pipelines,
     assign_action,
     baseline_score,
@@ -21,6 +23,25 @@ from work.scripts.refresh_capstone import (
 
 
 class RefreshCapstoneTests(unittest.TestCase):
+    def test_action_policy_covers_protect_monitor_and_public_safety(self):
+        frame = pd.DataFrame(
+            {
+                "impressions": [2_000, 500],
+                "prior_impressions": [1_000, 600],
+                "content_age_days": [300, 300],
+                "avg_position": [8.0, float("nan")],
+                "position_available": [True, False],
+            }
+        )
+        result = assign_action(frame, pd.Series([85.0, 85.0]))
+
+        self.assertEqual(result.loc[0, "suggested_action"], "protect")
+        self.assertEqual(result.loc[1, "suggested_action"], "monitor")
+        self.assertTrue(set(result["suggested_action"]).issubset(ALLOWED_ACTIONS))
+        self.assertTrue(result["reason_codes"].str.len().gt(0).all())
+        prohibited = {"client_name", "domain", "url", "query", "title", "future_decline", "outcome_impressions"}
+        self.assertTrue(prohibited.isdisjoint(PUBLIC_QUEUE_COLUMNS))
+
     def test_candidate_pipelines_are_safe_bounded_and_deterministic(self):
         frame = pd.DataFrame(
             {

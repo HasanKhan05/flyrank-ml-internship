@@ -38,6 +38,25 @@ MODEL_NUMERIC_FEATURES = (
 )
 MODEL_CATEGORICAL_FEATURES = ("content_type",)
 MODEL_FEATURES = MODEL_NUMERIC_FEATURES + MODEL_CATEGORICAL_FEATURES
+ALLOWED_ACTIONS = {
+    "refresh_or_expand_review",
+    "protect",
+    "consolidate_or_prune_review",
+    "monitor",
+}
+PUBLIC_QUEUE_COLUMNS = (
+    "rank",
+    "content_hash_id",
+    "baseline_score",
+    "suggested_action",
+    "reason_codes",
+    "confidence_tier",
+    "impressions",
+    "impression_momentum",
+    "avg_position",
+    "position_available",
+    "content_age_days",
+)
 
 
 def build_candidate_pipelines(random_seed: int = RANDOM_SEED) -> dict[str, Pipeline]:
@@ -249,6 +268,8 @@ def assign_action(frame: pd.DataFrame, scores: pd.Series) -> pd.DataFrame:
     result["suggested_action"] = actions
     result["reason_codes"] = reasons
     result["confidence_tier"] = confidence
+    if not set(actions).issubset(ALLOWED_ACTIONS):
+        raise AssertionError("Action policy emitted an unsupported action")
     return result
 
 

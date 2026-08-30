@@ -34,3 +34,6 @@ __pycache__/
 .venv/
 venv/
 .env
+
+# Local isolated development worktrees
+.worktrees/

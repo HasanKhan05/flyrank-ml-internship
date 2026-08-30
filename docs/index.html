@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refresh Opportunity Ranking Under Temporal Shift — Hasan Khan</title>
+  <meta name="description" content="A time-aware search intelligence study that ranks content for human refresh review and reports an honest validation-to-sealed reversal.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Refresh Opportunity Ranking Under Temporal Shift">
+  <meta property="og:description" content="A reproducible FlyRank search-intelligence capstone by Hasan Khan.">
+  <meta property="og:image" content="https://hasankhan05.github.io/flyrank-ml-internship/assets/sealed_month_comparison.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="assets/paper.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Paper navigation">
+      <a class="brand" href="#top">Hasan Khan · Research paper</a>
+      <div class="nav-links">
+        <a href="#data">Data</a>
+        <a href="#methodology">Method</a>
+        <a href="#results">Results</a>
+        <a href="#recommendations">Actions</a>
+        <a href="#reproducibility">Reproduce</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wide">
+        <p class="eyebrow">FlyRank ML Internship · Search Intelligence Capstone</p>
+        <h1>Refresh opportunity ranking under temporal shift</h1>
+        <p class="dek">A leakage-safe, time-aware system for deciding which already-visible content deserves scarce human review first.</p>
+        <div class="byline">
+          <span>Hasan Khan</span>
+          <span>Refresh / Content Opportunity Scoring</span>
+          <span>30 August 2026</span>
+          <a href="https://github.com/HasanKhan05/flyrank-ml-internship">View repository</a>
+        </div>
+        <div class="metric-grid" aria-label="Headline results">
+          <div class="metric"><strong>66%</strong><span>Validation Precision@50 for the selected transparent baseline</span></div>
+          <div class="metric"><strong>98%</strong><span>Sealed Precision@50 for the predeclared random-forest comparison</span></div>
+          <div class="metric"><strong>78.8M</strong><span>Daily warehouse rows covered by the reproducible data contract</span></div>
+          <div class="metric"><strong>50</strong><span>Human-review recommendations in the final ranked action queue</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="abstract">
+      <div class="wrap">
+        <p class="eyebrow">Abstract</p>
+        <h2>A ranking result—and a stability warning</h2>
+        <p class="lead">This study asks which already-visible content items should receive limited human refresh review before the next month. It aggregates the FlyRank pseudonymized warehouse into leakage-safe page-month examples. A fixed baseline, logistic regression, and random forest are compared with time-aware training, validation, and a one-time sealed test using Precision@50. The transparent baseline wins validation at 66% versus 54% for the strongest learned comparison, but the random forest reverses the order on the sealed month at 98% versus 68%, revealing temporal instability rather than a universally superior method. The output is a ranked 50-item human-review queue with reasons, confidence tiers, no-go rules, and monitoring triggers.</p>
+      </div>
+    </section>
+
+    <section class="section alt" id="problem">
+      <div class="wrap">
+        <p class="eyebrow">Introduction / Problem statement</p>
+        <h2>Spend editorial attention where it may matter most</h2>
+        <p>The decision is which content items deserve scarce editorial investigation first. One unit is one pseudonymized content item at one monthly decision anchor. The output is a ranked review-priority score with a suggested action, reasons, and confidence tier.</p>
+        <div class="two-col">
+          <article class="card">
+            <p class="card-kicker">Action supported</p>
+            <h3>Investigate, then decide</h3>
+            <p>An editor checks intent, accuracy, topic coverage, competing content, seasonality, tracking continuity, and business value before recommending any change.</p>
+          </article>
+          <article class="card">
+            <p class="card-kicker">Cost of a wrong call</p>
+            <h3>Time and unnecessary change</h3>
+            <p>A false positive wastes review capacity and can prompt disruption; a false negative misses a measured decline opportunity.</p>
+          </article>
+        </div>
+        <p>Data helps because exposure, momentum, position, age, CTR, and measurement completeness interact and vary through time. A single threshold does not describe those observed patterns consistently.</p>
+      </div>
+    </section>
+
+    <section class="section" id="data">
+      <div class="wrap">
+        <p class="eyebrow">Data</p>
+        <h2>A public-safe monthly decision table</h2>
+        <p>The study uses warehouse release <code>flyrank_pseudonymized_warehouse_release_v20260703</code>: 104 pseudonymized clients, 519,606 structured content records, and 78,835,655 daily performance rows from 27 January 2025 through 30 June 2026.</p>
+        <div class="two-col">
+          <article class="card">
+            <p class="card-kicker">Time windows</p>
+            <h3>Past, validation, sealed</h3>
+            <p>Training anchors: September 2025–March 2026. Validation: April predicting May. One-time sealed test: May predicting June.</p>
+          </article>
+          <article class="card">
+            <p class="card-kicker">Eligibility</p>
+            <h3>Measured, not assumed</h3>
+            <p>At least 100 current impressions and 20 measured GSC days in both feature and outcome months. Missing analytics remains missing.</p>
+          </article>
+        </div>
+        <div class="callout">
+          <strong>Privacy and leakage boundary.</strong> IDs are used only for joins, grouping, splitting, and pseudonymous queue references. Predictive inputs exclude identifiers, outcome-month fields, raw names, domains, URLs, queries, titles, provider/model fields, credentials, and the fixed 90-day query table.
+        </div>
+        <figure>
+          <img src="assets/base_rate_by_month.png" alt="Line chart showing observed next-month decline rates across seven training anchors, with a substantial March increase.">
+          <figcaption>Observed decline prevalence varies through time, making an out-of-time design essential.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section alt" id="methodology">
+      <div class="wrap">
+        <p class="eyebrow">Methodology</p>
+        <h2>Freeze the rule before opening the future</h2>
+        <p>The target is one when next-month measured impressions are below 80% of feature-month impressions, provided both months meet the coverage rule. The primary metric is Precision@50 because review capacity is limited.</p>
+        <div class="two-col">
+          <article class="card">
+            <p class="card-kicker">Transparent baseline</p>
+            <h3>Four fixed components</h3>
+            <p>40% log exposure, 30% negative prior momentum, 20% established-content age, and 10% valid position opportunity. Weights were frozen before model training.</p>
+          </article>
+          <article class="card">
+            <p class="card-kicker">Learned candidates</p>
+            <h3>Simple, reproducible models</h3>
+            <p>Standardized logistic regression and a 300-tree random forest with seed 42 and minimum leaf size 20.</p>
+          </article>
+        </div>
+        <p>Features include impressions, clicks, CTR, prior impressions/clicks, momentum, valid average position, content age, content type, and search volume. Numeric preprocessing is fit on training data; content type is one-hot encoded. Client/content identifiers and all outcome fields are excluded.</p>
+        <figure>
+          <img src="assets/signal_effects.png" alt="Horizontal bar chart of high-minus-low quartile decline-rate effects with keep, context-only, and exclude verdict colors.">
+          <figcaption>The signal audit separates useful content evidence from fields that mainly describe measurement access or coverage.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="wrap">
+        <p class="eyebrow">Results</p>
+        <h2>Validation selects simplicity; sealed data reverses the order</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Split and method</th><th>Rows</th><th>Base rate</th><th>Precision@50</th><th>Avg. precision</th><th>Lift@50</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Validation · fixed baseline</td><td>93,474</td><td>53.79%</td><td>66%</td><td>53.34%</td><td>1.23×</td></tr>
+              <tr><td>Validation · random forest</td><td>93,474</td><td>53.79%</td><td>54%</td><td>60.42%</td><td>1.00×</td></tr>
+              <tr><td>Sealed · fixed baseline</td><td>93,048</td><td>64.04%</td><td>68%</td><td>67.02%</td><td>1.06×</td></tr>
+              <tr><td>Sealed · random forest</td><td>93,048</td><td>64.04%</td><td>98%</td><td>72.22%</td><td>1.53×</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Logistic regression reached 40% validation Precision@50. The fixed baseline therefore remained the validation-selected operational method. The random forest’s sealed reversal is reported without changing the selection rule.</p>
+        <figure>
+          <img src="assets/validation_precision_at_k.png" alt="Line chart comparing validation precision across review capacities for the fixed baseline, logistic regression, and random forest.">
+          <figcaption>The winner changes with review capacity. The baseline is strongest at the declared top-50 cutoff, while learned candidates improve at other K values.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/sealed_month_comparison.png" alt="Grouped bar chart showing sealed Precision at 50 and average precision for the fixed baseline and random forest.">
+          <figcaption>On the one-time sealed month, the learned comparison reverses the top-50 result. This is evidence of temporal instability, not permission to retune.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section alt" id="limitations">
+      <div class="wrap">
+        <p class="eyebrow">Limitations &amp; honest framing</p>
+        <h2>What the numbers cannot establish</h2>
+        <div class="callout warning">
+          <strong>No causal claim.</strong> The label is an observed search-visibility proxy. It does not prove that a refresh causes movement, identify Google’s algorithm, or judge the quality of a person, client, or page.
+        </div>
+        <ul>
+          <li>Monthly base rates vary substantially; one strong sealed result does not establish a permanently superior method.</li>
+          <li>Coverage filters narrow applicability and GA4 coverage is sparse.</li>
+          <li>Seasonality, content intent, and business importance are incomplete.</li>
+          <li>A top-50 queue has extremely low recall in a population with tens of thousands of positives.</li>
+          <li>False positives can combine exposure, age, and negative momentum without meeting the next-month label.</li>
+        </ul>
+        <p>The result is measured, directional, and suitable only for prioritizing human review.</p>
+      </div>
+    </section>
+
+    <section class="section" id="recommendations">
+      <div class="wrap">
+        <p class="eyebrow">Ranked recommendations</p>
+        <h2>A conservative action playbook</h2>
+        <p>The May anchor produced 93,048 eligible items. The top 50 all map to refresh/expand review because every highest-ranked row has measured negative prior momentum; 34 also have meaningful exposure. Confidence is high for 20 and medium for 30.</p>
+        <ol class="steps">
+          <li><strong>Review the highest-ranked items.</strong> Check intent, factual accuracy, topical coverage, and competing content.</li>
+          <li><strong>Verify context before action.</strong> Rule out seasonality, tracking changes, and intentional demand shifts.</li>
+          <li><strong>Protect positive momentum.</strong> Avoid unnecessary edits to content that is currently growing.</li>
+          <li><strong>Consolidate cautiously.</strong> Require cannibalization and business-value evidence before merging or pruning.</li>
+          <li><strong>Monitor incomplete evidence.</strong> Do not force a recommendation when position, history, or measurement is weak.</li>
+        </ol>
+        <figure>
+          <img src="assets/action_mix.png" alt="Bar chart showing that all 50 highest-ranked review candidates receive a refresh or expand review suggestion.">
+          <figcaption>The observed top-50 mix is concentrated, not engineered for variety. Every action remains a review prompt.</figcaption>
+        </figure>
+        <p><strong>Monitoring triggers:</strong> re-audit after a base-rate or key-missingness shift over 10 percentage points, Precision@50 below the contemporaneous base rate, or a warehouse schema/release change.</p>
+      </div>
+    </section>
+
+    <section class="section alt" id="reproducibility">
+      <div class="wrap">
+        <p class="eyebrow">Reproducibility</p>
+        <h2>From warehouse contract to deployed paper</h2>
+        <p>Seed 42, tested reusable code, executed notebooks, public-safe figures, and JSON metric receipts are committed. Local Parquet and CSV caches are ignored. The sealed-frame construction and one-time evaluation receipt are inspectable.</p>
+        <ul class="notebooks">
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w03_data_contract.ipynb">Data contract notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w03_feature_leakage_check.ipynb">Feature &amp; leakage notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w04_signal_audit.ipynb">Signal audit notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w04_baseline_score.ipynb">Baseline notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w05_model.ipynb">Model notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w06_validation_audit.ipynb">Validation audit notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/w07_action_playbook.ipynb">Action playbook notebook</a></li>
+          <li><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb">Capstone notebook</a></li>
+        </ul>
+        <p><a href="https://github.com/HasanKhan05/flyrank-ml-internship/blob/main/work/capstone_report.md">Read the paper source</a> · <a href="https://github.com/HasanKhan05/flyrank-ml-internship">Browse the full repository</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer id="acknowledgments">
+    <div class="wrap">
+      <p class="eyebrow">Acknowledgments &amp; data credit</p>
+      <p class="credit"><a href="https://flyrank.ai">Built on the FlyRank ML Internship dataset</a>.</p>
+      <p>Research, analysis, implementation, and paper by Hasan Khan.</p>
+    </div>
+  </footer>
+</body>
+</html>

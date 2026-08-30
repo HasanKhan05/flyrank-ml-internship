@@ -1,0 +1,16 @@
+{
+  "lane": "Refresh / Content Opportunity Scoring",
+  "development_anchor": "2026-03 predicting 2026-04",
+  "eligible_rows": 88941,
+  "queue_rows": 18897,
+  "base_rate": 0.5125420222394621,
+  "precision_at_10": 0.9,
+  "precision_at_50": 0.8,
+  "signal_verdicts": {
+    "staleness": "MIXED",
+    "ctr_vs_position": "CONFIRMED"
+  },
+  "reason_code": "aging_visible_low_ctr",
+  "action_label": "refresh_or_metadata_review",
+  "sealed_month_used": false
+}

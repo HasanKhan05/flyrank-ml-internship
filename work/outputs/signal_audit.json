@@ -1,0 +1,90 @@
+{
+  "scope": "training anchors 2025-09 through 2026-03 only",
+  "training_rows": 341546,
+  "training_clients": 41,
+  "observed_base_rate": 0.293023487319424,
+  "effect_definition": "high-quartile minus low-quartile observed future-decline rate, percentage points",
+  "signals": [
+    {
+      "signal": "log_impressions",
+      "sample_size": 341546,
+      "low_quartile_rate": 0.26718110604466266,
+      "high_quartile_rate": 0.31321293888927926,
+      "effect_percentage_points": 4.603183284461659,
+      "verdict": "keep",
+      "practical_implication": "Exposure helps prioritize impact, but is not sufficient alone."
+    },
+    {
+      "signal": "impression_momentum",
+      "sample_size": 322210,
+      "low_quartile_rate": 0.33260089630429657,
+      "high_quartile_rate": 0.3156431169540551,
+      "effect_percentage_points": -1.6957779350241453,
+      "verdict": "keep",
+      "practical_implication": "The U-shaped quartile pattern requires a nonlinear model or explicit bands."
+    },
+    {
+      "signal": "avg_position",
+      "sample_size": 341542,
+      "low_quartile_rate": 0.26885825711173833,
+      "high_quartile_rate": 0.33156489354226687,
+      "effect_percentage_points": 6.270663643052854,
+      "verdict": "keep",
+      "practical_implication": "Position adds measured directional context when the validity flag is true."
+    },
+    {
+      "signal": "active_days",
+      "sample_size": 341546,
+      "low_quartile_rate": 0.21840933751128147,
+      "high_quartile_rate": 0.3348699784632362,
+      "effect_percentage_points": 11.646064095195472,
+      "verdict": "context only",
+      "practical_implication": "Useful for review context, but confounded with calendar and coverage."
+    },
+    {
+      "signal": "gsc_available_days",
+      "sample_size": 341546,
+      "low_quartile_rate": 0.21840933751128147,
+      "high_quartile_rate": 0.3348699784632362,
+      "effect_percentage_points": 11.646064095195472,
+      "verdict": "exclude",
+      "practical_implication": "Use as an eligibility check, not a model signal."
+    },
+    {
+      "signal": "ga4_available_days",
+      "sample_size": 341546,
+      "low_quartile_rate": 0.26944029012235665,
+      "high_quartile_rate": 0.3659644329402742,
+      "effect_percentage_points": 9.652414281791755,
+      "verdict": "exclude",
+      "practical_implication": "Reflects access/measurement availability rather than content quality."
+    },
+    {
+      "signal": "content_age_days",
+      "sample_size": 341546,
+      "low_quartile_rate": 0.2719156792633621,
+      "high_quartile_rate": 0.31069000399934127,
+      "effect_percentage_points": 3.8774324735979193,
+      "verdict": "keep",
+      "practical_implication": "Age adds established-content context; effect remains observational."
+    },
+    {
+      "signal": "ctr",
+      "sample_size": 341546,
+      "low_quartile_rate": 0.34313386776598176,
+      "high_quartile_rate": 0.2105152200138204,
+      "effect_percentage_points": -13.261864775216136,
+      "verdict": "keep",
+      "practical_implication": "CTR separates measured risk but does not diagnose a metadata cause."
+    },
+    {
+      "signal": "engaged_sessions",
+      "sample_size": 106394,
+      "low_quartile_rate": 0.3675938037121515,
+      "high_quartile_rate": 0.33844602865989776,
+      "effect_percentage_points": -2.9147775052253744,
+      "verdict": "exclude",
+      "practical_implication": "Sparse GA4 coverage would narrow and bias the usable queue."
+    }
+  ]
+}

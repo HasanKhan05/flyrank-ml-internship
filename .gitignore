@@ -31,6 +31,7 @@ work/**/*.csv
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+.duckdb_extensions/
 .venv/
 venv/
 .env

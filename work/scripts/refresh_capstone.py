@@ -4,6 +4,12 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 TRAIN_MONTHS = pd.period_range("2025-09", "2026-03", freq="M")
@@ -18,6 +24,74 @@ BASELINE_WEIGHTS = {
     "established_content": 0.20,
     "position_opportunity": 0.10,
 }
+MODEL_NUMERIC_FEATURES = (
+    "impressions",
+    "clicks",
+    "ctr",
+    "prior_impressions",
+    "prior_clicks",
+    "impression_momentum",
+    "avg_position",
+    "position_available",
+    "content_age_days",
+    "search_volume",
+)
+MODEL_CATEGORICAL_FEATURES = ("content_type",)
+MODEL_FEATURES = MODEL_NUMERIC_FEATURES + MODEL_CATEGORICAL_FEATURES
+
+
+def build_candidate_pipelines(random_seed: int = RANDOM_SEED) -> dict[str, Pipeline]:
+    """Return deterministic candidates whose preprocessing is fit within each pipeline."""
+    numeric_logistic = Pipeline(
+        [
+            ("imputer", SimpleImputer(strategy="median", add_indicator=True)),
+            ("scaler", StandardScaler()),
+        ]
+    )
+    numeric_forest = Pipeline(
+        [("imputer", SimpleImputer(strategy="median", add_indicator=True))]
+    )
+    categorical = Pipeline(
+        [
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("one_hot", OneHotEncoder(handle_unknown="ignore")),
+        ]
+    )
+
+    def preprocessing(numeric: Pipeline) -> ColumnTransformer:
+        return ColumnTransformer(
+            [
+                ("numeric", numeric, list(MODEL_NUMERIC_FEATURES)),
+                ("categorical", categorical, list(MODEL_CATEGORICAL_FEATURES)),
+            ],
+            remainder="drop",
+        )
+
+    return {
+        "logistic_regression": Pipeline(
+            [
+                ("preprocess", preprocessing(numeric_logistic)),
+                (
+                    "classifier",
+                    LogisticRegression(max_iter=1_000, random_state=random_seed),
+                ),
+            ]
+        ),
+        "random_forest": Pipeline(
+            [
+                ("preprocess", preprocessing(numeric_forest)),
+                (
+                    "classifier",
+                    RandomForestClassifier(
+                        n_estimators=300,
+                        random_state=random_seed,
+                        n_jobs=-1,
+                        min_samples_leaf=20,
+                    ),
+                ),
+            ]
+        ),
+    }
 
 
 def make_examples(monthly: pd.DataFrame) -> pd.DataFrame:

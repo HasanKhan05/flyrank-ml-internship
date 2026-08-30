@@ -1,0 +1,58 @@
+{
+  "training_window": "2025-09 through 2026-03",
+  "validation_window": "2026-04 predicting 2026-05",
+  "training_rows": 341546,
+  "validation_rows": 93474,
+  "validation_positive_rate": 0.5379463808117766,
+  "primary_metric": "precision_at_50",
+  "selection_rule": "prefer logistic if it beats baseline P@50 and P@25/P@50/P@100 all exceed base rate; otherwise consider random forest, then baseline",
+  "selected_method": "fixed_baseline",
+  "feature_columns": [
+    "impressions",
+    "clicks",
+    "ctr",
+    "prior_impressions",
+    "prior_clicks",
+    "impression_momentum",
+    "avg_position",
+    "position_available",
+    "content_age_days",
+    "search_volume",
+    "content_type"
+  ],
+  "candidates": [
+    {
+      "method": "fixed_baseline",
+      "rows": 93474,
+      "precision_at_50": 0.66,
+      "recall_at_50": 0.0006562723729218042,
+      "lift_at_50": 1.2268880757298544,
+      "average_precision": 0.5333564584802813,
+      "precision_at_25": 0.68,
+      "precision_at_100": 0.58
+    },
+    {
+      "method": "logistic_regression",
+      "rows": 93474,
+      "precision_at_50": 0.4,
+      "recall_at_50": 0.0003977408320738207,
+      "lift_at_50": 0.7435685307453663,
+      "average_precision": 0.5293826424426229,
+      "precision_at_25": 0.4,
+      "precision_at_100": 0.54
+    },
+    {
+      "method": "random_forest",
+      "rows": 93474,
+      "precision_at_50": 0.54,
+      "recall_at_50": 0.0005369501232996579,
+      "lift_at_50": 1.0038175165062444,
+      "average_precision": 0.6041660074221528,
+      "precision_at_25": 0.48,
+      "precision_at_100": 0.57
+    }
+  ],
+  "identical_validation_rows": true,
+  "sealed_month_used": false,
+  "random_seed": 42
+}

@@ -10,6 +10,8 @@ from work.scripts.build_monthly_features import (
 )
 from work.scripts.refresh_capstone import (
     BASELINE_WEIGHTS,
+    MODEL_FEATURES,
+    build_candidate_pipelines,
     assign_action,
     baseline_score,
     make_examples,
@@ -19,6 +21,38 @@ from work.scripts.refresh_capstone import (
 
 
 class RefreshCapstoneTests(unittest.TestCase):
+    def test_candidate_pipelines_are_safe_bounded_and_deterministic(self):
+        frame = pd.DataFrame(
+            {
+                "impressions": [100, 200, 300, 400, 500, 600, 700, 800],
+                "clicks": [1, 3, 2, 8, 5, 12, 7, 16],
+                "ctr": [.01, .015, .007, .02, .01, .02, .01, .02],
+                "prior_impressions": [120, 180, 350, 390, 550, 500, 800, 700],
+                "prior_clicks": [1, 2, 3, 7, 6, 10, 8, 14],
+                "impression_momentum": [.83, 1.11, .86, 1.03, .91, 1.2, .88, 1.14],
+                "avg_position": [8, 12, 5, 20, 7, 15, 9, 18],
+                "position_available": [True] * 8,
+                "content_age_days": [100, 200, 300, 400, 120, 220, 320, 420],
+                "content_type": ["article", "landing"] * 4,
+                "search_volume": [10, 20, 30, 40, 15, 25, 35, 45],
+                "client_hash_id": [f"client_{i}" for i in range(8)],
+                "content_hash_id": [f"content_{i}" for i in range(8)],
+                "future_decline": [0, 1, 0, 1, 0, 1, 0, 1],
+                "outcome_impressions": [110, 100, 320, 200, 520, 250, 710, 300],
+            }
+        )
+        labels = frame["future_decline"]
+        first = build_candidate_pipelines(random_seed=42)["logistic_regression"]
+        second = build_candidate_pipelines(random_seed=42)["logistic_regression"]
+        first.fit(frame[list(MODEL_FEATURES)], labels)
+        second.fit(frame[list(MODEL_FEATURES)], labels)
+        first_probability = first.predict_proba(frame[list(MODEL_FEATURES)])[:, 1]
+        second_probability = second.predict_proba(frame[list(MODEL_FEATURES)])[:, 1]
+
+        self.assertTrue(((first_probability >= 0) & (first_probability <= 1)).all())
+        self.assertEqual(first_probability.tolist(), second_probability.tolist())
+        self.assertTrue({"client_hash_id", "content_hash_id", "future_decline", "outcome_impressions"}.isdisjoint(MODEL_FEATURES))
+
     def test_frozen_baseline_prioritizes_exposure_and_worsening_momentum(self):
         frame = pd.DataFrame(
             {
